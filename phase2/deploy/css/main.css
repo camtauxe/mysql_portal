@@ -1,0 +1,53 @@
+body {
+    background: whitesmoke;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    margin: initial;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background: steelblue;
+    border-bottom: 5px solid rgb(41, 107, 160);
+    box-shadow: dimgray 0px 3px 4px;
+
+    display: flex;
+    align-items: center;
+}
+
+#titletext {
+    color: whitesmoke;
+    font-weight: bolder;
+    font-size: 24pt;
+}
+
+.controllabel {
+    color: whitesmoke;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+header > div {
+    margin: 10px 15px;
+}
+
+main {
+    flex-grow: 1;
+    position: relative;
+}
+
+#tablewrapper {
+    border: 2px solid crimson;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+}

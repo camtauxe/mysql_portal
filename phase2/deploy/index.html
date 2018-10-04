@@ -5,12 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>MySQL Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/main.css" />
 </head>
 <body>
-    <h1>
-        Hello World!
-    </h1>
-    <a href="/tables.py">See tables in database...</a>
+    <header>
+        <div id="titletext">CS482 MySQL Portal</div>
+        <div class="controlwrapper">
+            <div class="controllabel">Select table:</div>
+            <select id="tableselect">
+
+            </select>
+        </div>
+    </header>
+    <main>
+        <div id="tablewrapper">
+            <table id="table"></table>
+        </div>
+    </main>
+    
 </body>
 </html>
