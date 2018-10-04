@@ -16,7 +16,7 @@ def print_response(response_text, status, content_type):
     )
     if not response.endswith("\n"):
         response += "\n"
-    print response.encode('utf-8')
+    sys.stdout.buffer.write(response.encode('utf-8'))
 
 # Print a complete HTTP response giving a 400 (Bad Request)
 # with the given message as the response text (as plaintext)
