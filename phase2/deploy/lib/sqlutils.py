@@ -93,13 +93,13 @@ def get_tables():
         error_and_exit(err)
 
 # Execute a given query as the "read only" user on the database
-# and get all of the results as a list of dictionaries
+# and get all of the results. The data is formatted using the
+# serialize_cursor() function, show see the documentation for
+# that to understand the format of the data.
 # 
 # Instances of '%s' in sql_string will be safely replaced by
 # corresponding values in values_tuple. Do this whenever possible to
 # prevent SQL injection.
-#
-# Note that the returned data will all be represented as strings
 # 
 # If a connection has not already been established, or if one is
 # established but in volatile mode, the connection will be re-established
@@ -111,23 +111,29 @@ def exec_readonly_query(sql_string, values_tuple = ()):
     try:
         cursor = current_connection.cursor()
         cursor.execute(sql_string, values_tuple)
-        dicts = dicts_from_cursor(cursor)
+        dicts = serialize_cursor(cursor)
         cursor.close()
         return dicts
     except mysql.connector.Error as err:
         error_and_exit(err)
 
-# Get a list of dictionaries representing all of the results stored
-# stored in the given cursor.
-# All of the data will be represented as strings when returned
-def dicts_from_cursor(cursor):
-    col_names   = [d[0].lower() for d in cursor.description]
-    rows        = cursor.fetchall()
-    dicts       = []
+# Serialize all of the result data stored in a cursor into a
+# a dictionary for easy conversion to JSON later.
+# The dictionary has two fields at the root level: 'columns' and 'data'
+# 'columns' is a list of strings giving the names of each of the columns
+# in the data.
+# 'data' is a list of lists representing the data in each row. The order of
+# the data within a row matches the order the of the columns in the 'columns's
+# Note that all data is converted to strings during this process
+def serialize_cursor(cursor):
+    col_names = [d[0].lower() for d in cursor.description]
+    rows = cursor.fetchall()
+
+    serialized = {'columns': col_names, 'data': []}
     for row in rows:
         as_strings = [str(d) for d in row]
-        dicts.append(dict(zip(col_names, as_strings)))
-    return dicts
+        serialized['data'].append(as_strings)
+    return serialized
 
 # Close the current connection
 # If there is no current connection, this does nothing

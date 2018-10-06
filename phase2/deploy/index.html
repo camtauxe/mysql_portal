@@ -6,13 +6,14 @@
     <title>MySQL Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="/css/main.css" />
+    <script src="https://d3js.org/d3-selection.v1.js"></script>
 </head>
 <body>
     <header>
         <div id="titletext">CS482 MySQL Portal</div>
         <div class="controlwrapper">
             <div class="controllabel">Select table:</div>
-            <select id="tableselect">
+            <select id="tableselect" onchange="fetchAllData()">
 
             </select>
         </div>
@@ -22,6 +23,6 @@
             <table id="table"></table>
         </div>
     </main>
-    
+    <script src="/js/main.js"></script>
 </body>
 </html>

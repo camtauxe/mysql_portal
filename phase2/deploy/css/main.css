@@ -44,10 +44,33 @@ main {
 }
 
 #tablewrapper {
-    border: 2px solid crimson;
+    border: 3px solid dimgray;
+    border-radius: 5px;
     position: absolute;
     top: 10px;
     right: 10px;
     bottom: 10px;
     left: 10px;
+    overflow: auto;
+}
+
+#table {
+    border-collapse: collapse;
+    background: whitesmoke;
+    width: 100%;
+}
+
+#table tr:nth-child(odd) {
+    background: rgb(228, 228, 228);
+}
+
+#table tr:first-child {
+    background: lightgray;
+    font-size: 1.25em;
+    font-weight: bold;
+    border-bottom: 2px solid dimgray;
+}
+
+#table td {
+    padding: 5px;
 }
