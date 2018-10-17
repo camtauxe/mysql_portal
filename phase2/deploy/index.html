@@ -14,15 +14,28 @@
         <div class="controlwrapper">
             <div class="controllabel">Select table:</div>
             <select id="tableselect" onchange="fetchAllData()">
-
+                <!--
+                    Options are populated by retrieving the list of
+                    tables from the database
+                -->
             </select>
         </div>
+        <div class="flexspacer"></div>
+        <div class="controlwrapper">
+            <button id="clearButton">Clear Data</button>
+        </div>
+        <div class="controlwrapper">
+            <button id="uploadButton">Upload Data</button>
+        </div>
     </header>
-    <main>
+    <div id="middlearea">
+        
+    </div>
+    <div id="tablearea">
         <div id="tablewrapper">
             <table id="table"></table>
         </div>
-    </main>
+    </div>
     <script src="/js/main.js"></script>
 </body>
 </html>

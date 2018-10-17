@@ -17,9 +17,14 @@ header {
     background: steelblue;
     border-bottom: 5px solid rgb(41, 107, 160);
     box-shadow: dimgray 0px 3px 4px;
+    z-index: 10;
 
     display: flex;
     align-items: center;
+}
+
+.flexspacer {
+    flex-grow: 1;
 }
 
 #titletext {
@@ -38,7 +43,14 @@ header > div {
     margin: 10px 15px;
 }
 
-main {
+#middlearea {
+    height: 50px;
+    margin: 0px 25px 5px;
+    background-color: rgb(199, 198, 198);
+    border-radius: 0px 0px 5px 5px;
+}
+
+#tablearea {
     flex-grow: 1;
     position: relative;
 }
