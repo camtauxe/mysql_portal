@@ -12,7 +12,7 @@ from . import cgiutils
 
 # Constants
 MYSQL_HOSTNAME  = 'localhost'
-MYSQL_DB        = 'cs482'
+MYSQL_DB        = 'cs482team'
 
 MYSQL_READONLY_USER      = 'readonly'
 MYSQL_READONLY_PASSWORD  = None
