@@ -1,0 +1,6 @@
+Arena
+Stadium
+Colosseum
+Park
+Court
+Field
