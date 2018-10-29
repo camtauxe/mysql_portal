@@ -153,3 +153,16 @@ def error_and_exit(err):
             str(err.msg)
     )
     exit()
+    
+#delete all data from a given table function
+def delete_data(table):
+	global current_connection
+    if current_connection is None:
+        connect_volatile()
+    try :
+        cursor = current_connection.cursor()
+        cursor.execute("TRUNCATE TABLE '"+table+"'")
+        cursor.close()
+    except mysql.connector.Error as err:
+        error_and_exit(err)
+        

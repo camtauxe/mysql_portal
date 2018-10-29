@@ -25,6 +25,7 @@ if table not in tables:
     exit()
 
 # Do deletion
+delete_data(table)
 
 # Print the HTTP response
 cgiutils.print_response("OK", "200 OK", "text/plain")
