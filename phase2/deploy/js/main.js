@@ -1,6 +1,13 @@
 // Selections for components
-tableSelect = d3.select('#tableselect');
-table       = d3.select('#table');
+tableSelect     = d3.select('#tableselect');
+table           = d3.select('#table');
+fileSelect      = d3.select('#fileselect');
+singleOption    = d3.select('#singleoption');
+bulkOption      = d3.select('#bulkoption');
+uploadButton    = d3.select('#uploadbutton');
+clearButton     = d3.select('#clearbutton');
+query           = d3.select('#query');
+queryButton     = d3.select('#querybutton')
 
 // Get list of tables from the database and populate
 // the table select with the results
@@ -19,17 +26,19 @@ fetch("/tables.py").then(function(response) {
     fetchAllData();
 });
 
-/**
- * Populate the table with all of the data in the currently
- * selected table
- */
-function fetchAllData() {
-    tableName = tableSelect.node().value;
-    setGlobalEnabled(false);
-    fetch("getall.py?t="+tableName).then(function(response) {
+function doQuery() {
+    setGlobalEnabled(false)
+    var queryText = query.node().value;
+    if (queryText == "") {
+        window.alert("You must enter a query!");
+        setGlobalEnabled(true);
+        return;
+    }
+    fetch("query.py?q="+encodeURIComponent(queryText)).then(function(response) {
         if (response.ok)
             return response.json();
-        responseError("Unable to fetch data!", response);
+        responseError("Unable to execute query!", response);
+        setGlobalEnabled(true);
     }).then(function(json) {
         columns = json['columns'];
         data = [columns].concat(json['data']);
@@ -45,7 +54,63 @@ function fetchAllData() {
                     .text(function(k){ return k;});
             });
         setGlobalEnabled(true);
-    })
+    });
+}
+
+/**
+ * Populate the table with all of the data in the currently
+ * selected table
+ */
+function fetchAllData() {
+    var tableName = tableSelect.node().value;
+    query.node().value = "SELECT * FROM " + tableName;
+    doQuery();
+}
+
+function upload() {
+    setGlobalEnabled(false);
+    var fileList = fileSelect.node().files;
+    var tableName = tableSelect.node().value;
+    if (fileList.length == 0) {
+        window.alert("You must select a file first!");
+        setGlobalEnabled(true);
+        return;
+    }
+    var type = bulkOption.node().checked ? bulkOption.node().value : singleOption.node().value
+    var file = fileList[0];
+    var data = new FormData();
+    data.append('file',file)
+
+    fetch("upload.py?type="+type+"&t="+tableName, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: file
+    }).then(function(response) {
+        if (response.ok)
+            return response.json();
+        responseError("Error with uploaded data!", response);
+    }).then(function(json) {
+        fetchAllData();
+        window.alert("Insertion completed in "+json.time+" seconds!");
+    });
+}
+
+function clearTable() {
+    setGlobalEnabled(false);
+    var tableName = tableSelect.node().value;
+
+    fetch("clear.py?t="+tableName, {
+        method: "POST"
+    }).then(function(response) {
+        if (response.ok) {
+            fetchAllData();
+            return;
+        }
+        responseError("Error clearing table!", response);
+        setGlobalEnabled(true);
+    });
 }
 
 /**
@@ -55,7 +120,10 @@ function fetchAllData() {
  * confounding requests in the meantime.
  */
 function setGlobalEnabled(enabled) {
-    tableSelect.node().disabled = !enabled;
+    tableSelect.node().disabled     = !enabled;
+    clearButton.node().disabled     = !enabled;
+    uploadButton.node().disabled    = !enabled;
+    queryButton.node().disabled     = !enabled;
 }
 
 /**

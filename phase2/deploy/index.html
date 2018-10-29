@@ -22,14 +22,29 @@
         </div>
         <div class="flexspacer"></div>
         <div class="controlwrapper">
-            <button id="clearButton">Clear Data</button>
+            <button id="clearbutton" onclick="clearTable()">Clear Data</button>
+        </div>
+        <div>
+            <input id="fileselect" type="file" name="file" accept="text/csv">
         </div>
         <div class="controlwrapper">
-            <button id="uploadButton">Upload Data</button>
+            <input id="singleoption" type="radio" name="type" value="single">
+            <label for="singleoption">Single-Insert</label>
+            <br>
+            <input id="bulkoption" type="radio" name="type" value="bulk" checked="checked">
+            <label for="bulkoption">Bulk-Loading</label>
+        </div>
+        <div class="controlwrapper">
+            <button id="uploadbutton" onclick="upload()">Upload Data</button>
         </div>
     </header>
     <div id="middlearea">
-        
+        <div id="querywrapper" class="controlwrapper">
+            <input id="query" type="text">
+        </div>
+        <div class="controlwrapper">
+            <button id="querybutton" onclick="doQuery()">Query</button>
+        </div>
     </div>
     <div id="tablearea">
         <div id="tablewrapper">
