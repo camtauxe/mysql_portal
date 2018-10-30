@@ -2,6 +2,7 @@
 import json
 import sys
 import cgi
+from time import time
 
 from lib import cgiutils
 from lib import sqlutils
@@ -41,6 +42,10 @@ if table not in tables:
     exit()
 
 # Do insertion and calculate time
+before = time()
+sqlutils.insert_data(table,insertType,data)
+after = time()
+totalTime = str("%.3f" % (after - before))
 
-# Print the HTTP response
-cgiutils.print_response("{\"time\": \"100\"}", "200 OK", "text/json")
+# Print the HTTP response with a JSON string specifying the time
+cgiutils.print_response("{\"time\": \""+totalTime+"\"}", "200 OK", "text/json")

@@ -43,6 +43,9 @@ MAX_REVENUE = 10000000
 POSITIONS   = ['QB', 'RB', 'WR']
 RESULTS     = ['W', 'L', 'T']
 
+MIN_GAMES_PER_PLAYER = 3
+MAX_GAMES_PER_PLAYER = 20
+
 def list_from_file(path):
     ls = []
     with open(path, "r") as f:
@@ -91,52 +94,74 @@ def random_game(index):
     ]
 
 players_small   = [random_player(x) for x in range(NUM_PLAYERS_SMALL) ]
-#players_medium  = [random_player(x) for x in range(NUM_PLAYERS_MEDIUM)]
-#players_large   = [random_player(x) for x in range(NUM_PLAYERS_LARGE) ]
+players_medium  = [random_player(x) for x in range(NUM_PLAYERS_MEDIUM)]
+players_large   = [random_player(x) for x in range(NUM_PLAYERS_LARGE) ]
 
 games_small     = [random_game(x) for x in range(NUM_GAMES_SMALL) ]
-#games_medium    = [random_game(x) for x in range(NUM_GAMES_MEDIUM)]
-#games_large     = [random_game(x) for x in range(NUM_GAMES_LARGE) ]
+games_medium    = [random_game(x) for x in range(NUM_GAMES_MEDIUM)]
+games_large     = [random_game(x) for x in range(NUM_GAMES_LARGE) ]
 
 def random_play(player_list, game_list):
     return [random.choice(player_list)[1], random.choice(game_list)[0]]
 
-plays_small     = [random_play(players_small, games_small)      for x in range(NUM_PLAYS_SMALL) ]
-#plays_medium    = [random_play(players_medium, games_medium)    for x in range(NUM_PLAYS_MEDIUM)]
-#plays_large     = [random_play(players_large, games_large)      for x in range(NUM_PLAYS_LARGE) ]
+def random_plays(player_list, game_list, num_rows):
+    plays = []
+    used_playerids = []
+    while len(plays) < num_rows:
+        randplayerid = random.choice(player_list)[1]
+        while randplayerid in used_playerids:
+            randplayerid = random.choice(player_list)[1]
+        used_playerids.append(randplayerid)
+        
+        num_games = random.randint(MIN_GAMES_PER_PLAYER, MAX_GAMES_PER_PLAYER)
+        gameids = []
+        for _ in range(num_games):
+            randgameid = random.choice(game_list)[0]
+            while randgameid in gameids:
+                randgameid = random.choice(game_list)[0]
+            gameids.append(randgameid)
+        for gameid in gameids:
+            plays.append([randplayerid,gameid])
+            if len(plays) == num_rows:
+                break
+    return plays
+
+plays_small     = random_plays(players_small,   games_small,    NUM_PLAYS_SMALL)
+plays_medium    = random_plays(players_medium,  games_medium,   NUM_PLAYS_MEDIUM)
+plays_large     = random_plays(players_large,   games_large,    NUM_PLAYS_LARGE)
 
 with open(os.path.join(OUTPUT_DIR,"players_small.csv"), "wb") as f:
     writer = csv.writer(f)
     writer.writerows(players_small)
 
-#with open(os.path.join(OUTPUT_DIR,"players_medium.csv"), "wb") as f:
-#    writer = csv.writer(f)
-#    writer.writerows(players_medium)
+with open(os.path.join(OUTPUT_DIR,"players_medium.csv"), "wb") as f:
+    writer = csv.writer(f)
+    writer.writerows(players_medium)
 
-#with open(os.path.join(OUTPUT_DIR,"players_large.csv"), "wb") as f:
-#    writer = csv.writer(f)
-#    writer.writerows(players_large)
+with open(os.path.join(OUTPUT_DIR,"players_large.csv"), "wb") as f:
+    writer = csv.writer(f)
+    writer.writerows(players_large)
 
 with open(os.path.join(OUTPUT_DIR,"games_small.csv"), "wb") as f:
     writer = csv.writer(f)
     writer.writerows(games_small)
 
-#with open(os.path.join(OUTPUT_DIR,"games_medium.csv"), "wb") as f:
-#    writer = csv.writer(f)
-#    writer.writerows(games_medium)
+with open(os.path.join(OUTPUT_DIR,"games_medium.csv"), "wb") as f:
+    writer = csv.writer(f)
+    writer.writerows(games_medium)
 
-#with open(os.path.join(OUTPUT_DIR,"games_large.csv"), "wb") as f:
-#    writer = csv.writer(f)
-#    writer.writerows(games_large)
+with open(os.path.join(OUTPUT_DIR,"games_large.csv"), "wb") as f:
+    writer = csv.writer(f)
+    writer.writerows(games_large)
 
 with open(os.path.join(OUTPUT_DIR,"plays_small.csv"), "wb") as f:
     writer = csv.writer(f)
     writer.writerows(plays_small)
 
-#with open(os.path.join(OUTPUT_DIR,"plays_medium.csv"), "wb") as f:
-#    writer = csv.writer(f)
-#    writer.writerows(plays_medium)
+with open(os.path.join(OUTPUT_DIR,"plays_medium.csv"), "wb") as f:
+    writer = csv.writer(f)
+    writer.writerows(plays_medium)
 
-#with open(os.path.join(OUTPUT_DIR,"plays_large.csv"), "wb") as f:
-#    writer = csv.writer(f)
-#    writer.writerows(plays_large)
+with open(os.path.join(OUTPUT_DIR,"plays_large.csv"), "wb") as f:
+    writer = csv.writer(f)
+    writer.writerows(plays_large)

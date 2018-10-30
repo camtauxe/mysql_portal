@@ -1,4 +1,6 @@
 import mysql.connector
+import csv
+from io import StringIO
 
 from . import cgiutils
 
@@ -146,6 +148,34 @@ def serialize_cursor(cursor):
 
     return serialized
 
+def insert_data(table, mode, data):
+    clear_table(table)
+    global current_connection, current_mode
+    if current_mode is not VOLATILE_MODE:
+        connect_volatile()
+    try:
+        cursor = current_connection.cursor()
+        cursor.execute("SHOW columns FROM "+table)
+        num_columns = len([col[0] for col in cursor.fetchall()])
+
+        insert_stmt = "INSERT INTO "+table+" VALUES ("+("%s, "*(num_columns-1))+"%s)"
+
+        dataIO = StringIO(data)
+        reader = csv.reader(dataIO)
+        for row in reader:
+            if len(row) is not num_columns:
+                cgiutils.print_error400("Error parsing data!\nIncorrect number of values in a row!")
+                exit()
+            cursor.execute(insert_stmt, tuple(row))
+            if mode == 'single':
+                current_connection.commit()
+
+        if mode == 'bulk':
+            current_connection.commit()
+        current_connection.close()
+    except mysql.connector.Error as err:
+        error_and_exit(err)
+
 # Delete all of the data from the given table.
 # Note that this does not drop the table from the schema,
 # rahter it deletes every row in the table.
@@ -158,10 +188,10 @@ def clear_table(table):
     global current_connection, current_mode
     if current_mode is not VOLATILE_MODE:
         connect_volatile()
-    try :
+    try:
         cursor = current_connection.cursor()
-        cursor.execute("TRUNCATE TABLE '"+table+"'")
-        cursor.close()
+        cursor.execute("DELETE FROM "+table)
+        current_connection.commit()
         close()
     except mysql.connector.Error as err:
         error_and_exit(err)
