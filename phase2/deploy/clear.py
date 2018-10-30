@@ -25,7 +25,11 @@ if table not in tables:
     exit()
 
 # Do deletion
-delete_data(table)
+sqlutils.clear_table(table)
+
+# No need to close connection, because when performing volatile operations
+# (i.e. changing the state of the database), the connection is closed
+# immediately for security
 
 # Print the HTTP response
 cgiutils.print_response("OK", "200 OK", "text/plain")

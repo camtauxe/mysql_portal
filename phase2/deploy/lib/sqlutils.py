@@ -135,6 +135,26 @@ def serialize_cursor(cursor):
         serialized['data'].append(as_strings)
     return serialized
 
+# Delete all of the data from the given table.
+# Note that this does not drop the table from the schema,
+# rahter it deletes every row in the table.
+#
+# If a connection has not already been established, or if one is
+# established but in read-only mode, the connection will be re-established
+# in volatile mode. For security, because this uses volatile mode, the 
+# connection will be closed immediately afterwards.
+def clear_table(table):
+    global current_connection, current_mode
+    if current_mode is not VOLATILE_MODE:
+        connect_volatile()
+    try :
+        cursor = current_connection.cursor()
+        cursor.execute("TRUNCATE TABLE '"+table+"'")
+        cursor.close()
+        close()
+    except mysql.connector.Error as err:
+        error_and_exit(err)
+
 # Close the current connection
 # If there is no current connection, this does nothing
 def close():
@@ -153,16 +173,4 @@ def error_and_exit(err):
             str(err.msg)
     )
     exit()
-    
-#delete all data from a given table function
-def delete_data(table):
-	global current_connection
-    if current_connection is None:
-        connect_volatile()
-    try :
-        cursor = current_connection.cursor()
-        cursor.execute("TRUNCATE TABLE '"+table+"'")
-        cursor.close()
-    except mysql.connector.Error as err:
-        error_and_exit(err)
-        
+
