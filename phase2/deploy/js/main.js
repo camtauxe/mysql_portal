@@ -7,7 +7,8 @@ bulkOption      = d3.select('#bulkoption');
 uploadButton    = d3.select('#uploadbutton');
 clearButton     = d3.select('#clearbutton');
 query           = d3.select('#query');
-queryButton     = d3.select('#querybutton')
+queryButton     = d3.select('#querybutton');
+queryReadout    = d3.select('#queryreadout');
 
 // Get list of tables from the database and populate
 // the table select with the results
@@ -53,6 +54,9 @@ function doQuery() {
                     .merge(cells)
                     .text(function(k){ return k;});
             });
+        queryReadout.text(json['rows']+" results in "+json['time']+" seconds.")
+        if (json['rows'] > data.length-1)
+            queryReadout.text(queryReadout.text()+" (showing first "+(data.length-1)+" rows)");
         setGlobalEnabled(true);
     });
 }

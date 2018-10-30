@@ -23,6 +23,8 @@ MYSQL_VOLATILE_PASSWORD  = 'C$482pass'
 READONLY_MODE = 0
 VOLATILE_MODE = 1
 
+MAX_ROWS = 100
+
 # Global variables
 current_connection  = None
 current_mode        = None
@@ -117,22 +119,31 @@ def exec_readonly_query(sql_string, values_tuple = ()):
     except mysql.connector.Error as err:
         error_and_exit(err)
 
-# Serialize all of the result data stored in a cursor into a
-# a dictionary for easy conversion to JSON later.
-# The dictionary has two fields at the root level: 'columns' and 'data'
+# Serialize the results stored in a cursor into a dictionary for easy
+# conversion to JSON later.
+#
+# The dictionary has three fields: 'columns', 'rows' and 'data'
 # 'columns' is a list of strings giving the names of each of the columns
 # in the data.
-# 'data' is a list of lists representing the data in each row. The order of
-# the data within a row matches the order the of the columns in the 'columns's
+# 'rows' is the total number of rows in the results.
+# 'data' is a list of lists representing the data.
+# The order of the data within a row matches the order the of 
+# the columns in the 'columns' list.
+#
+# The data is truncated according to the value of MAX_ROWS, so even if the
+# cursor returned more rows, they are not included in the serialization.
+# But the 'rows' value will still refer to the total number of rows.
 # Note that all data is converted to strings during this process
 def serialize_cursor(cursor):
     col_names = [d[0].lower() for d in cursor.description]
     rows = cursor.fetchall()
+    num_rows = cursor.rowcount
 
-    serialized = {'columns': col_names, 'data': []}
-    for row in rows:
+    serialized = {'columns': col_names, 'rows': num_rows, 'data': []}
+    for row in rows[:MAX_ROWS]:
         as_strings = [str(d) for d in row]
         serialized['data'].append(as_strings)
+
     return serialized
 
 # Delete all of the data from the given table.

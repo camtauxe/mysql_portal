@@ -2,6 +2,7 @@
 import json
 import cgi
 import cgitb
+from time import time
 
 from lib import cgiutils
 from lib import sqlutils
@@ -19,8 +20,13 @@ if not query:
         "You must provide the query as a parameter 'q'")
     exit()
 
-# Execute query
+# Execute query and time how long it takes
+before = time() 
 results = sqlutils.exec_readonly_query(query)
+after = time()
+
+# Add time to results then convert to json
+results['time'] = str("%.3f" % (after - before))
 results_json = json.dumps(results)
 
 # Using the database established a connection

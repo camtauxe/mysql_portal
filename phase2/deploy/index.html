@@ -39,11 +39,15 @@
         </div>
     </header>
     <div id="middlearea">
-        <div id="querywrapper" class="controlwrapper">
-            <input id="query" type="text">
+        <div id="querywrapper">
+            <div id="queryinputwrapper" class="controlwrapper">
+                <input id="query" type="text">
+            </div>
+            <div class="controlwrapper">
+                <button id="querybutton" onclick="doQuery()">Query</button>
+            </div>
         </div>
-        <div class="controlwrapper">
-            <button id="querybutton" onclick="doQuery()">Query</button>
+        <div id="queryreadout" class="controlwrapper">
         </div>
     </div>
     <div id="tablearea">
