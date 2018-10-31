@@ -138,14 +138,16 @@ def exec_readonly_query(sql_string, values_tuple = ()):
 # Note that all data is converted to strings during this process
 def serialize_cursor(cursor):
     col_names = [d[0].lower() for d in cursor.description]
-    rows = cursor.fetchall()
-    num_rows = cursor.rowcount
 
-    serialized = {'columns': col_names, 'rows': num_rows, 'data': []}
-    for row in rows[:MAX_ROWS]:
+    serialized = {'columns': col_names, 'data': []}
+    rows = cursor.fetchmany(MAX_ROWS)
+    for row in rows:
         as_strings = [str(d) for d in row]
         serialized['data'].append(as_strings)
-
+    more_rows = cursor.fetchmany(1000)
+    while more_rows != []:
+        more_rows = cursor.fetchmany(1000)
+    serialized['rows'] = cursor.rowcount
     return serialized
 
 def insert_data(table, mode, data):
@@ -172,6 +174,7 @@ def insert_data(table, mode, data):
 
         if mode == 'bulk':
             current_connection.commit()
+        cursor.close()
         current_connection.close()
     except mysql.connector.Error as err:
         error_and_exit(err)

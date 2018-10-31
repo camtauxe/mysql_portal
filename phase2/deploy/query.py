@@ -20,7 +20,7 @@ if not query:
         "You must provide the query as a parameter 'q'")
     exit()
 
-# Execute query and time how long it takes
+# Execute query
 before = time() 
 results = sqlutils.exec_readonly_query(query)
 after = time()
