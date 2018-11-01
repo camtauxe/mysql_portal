@@ -27,6 +27,10 @@ fetch("/tables.py").then(function(response) {
     fetchAllData();
 });
 
+/**
+ * Execute the query written in the query text field
+ * and populate the table with the results
+ */
 function doQuery() {
     setGlobalEnabled(false)
     var queryText = query.node().value;
@@ -71,6 +75,10 @@ function fetchAllData() {
     doQuery();
 }
 
+/**
+ * Upload the selected file from the fileSelect to the selected
+ * table in the selected mode.
+ */
 function upload() {
     setGlobalEnabled(false);
     var fileList = fileSelect.node().files;
@@ -101,6 +109,9 @@ function upload() {
     });
 }
 
+/**
+ * Clear the currently selected table
+ */
 function clearTable() {
     setGlobalEnabled(false);
     var tableName = tableSelect.node().value;

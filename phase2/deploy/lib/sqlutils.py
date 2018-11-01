@@ -140,16 +140,27 @@ def serialize_cursor(cursor):
     col_names = [d[0].lower() for d in cursor.description]
 
     serialized = {'columns': col_names, 'data': []}
+    # Fetch MAX_ROWS results and add them to the data list
     rows = cursor.fetchmany(MAX_ROWS)
     for row in rows:
         as_strings = [str(d) for d in row]
         serialized['data'].append(as_strings)
+    # Fetch and discard the remaining results to get the row count
+    # We fetch rows 1000 at a time to avoid filling up our memory
     more_rows = cursor.fetchmany(1000)
     while more_rows != []:
         more_rows = cursor.fetchmany(1000)
     serialized['rows'] = cursor.rowcount
     return serialized
 
+# Insert the given data (as a CSV string) into the given table
+# using the given mode ('single' or 'bulk').
+#
+# Before attempting to insert, the data currently in the table is cleared.
+# If a connection has not already been established, or if one is
+# established but in read-only mode, the connection will be re-established
+# in volatile mode. For security, because this uses volatile mode, the 
+# connection will be closed immediately afterwards.
 def insert_data(table, mode, data):
     clear_table(table)
     global current_connection, current_mode
@@ -157,21 +168,28 @@ def insert_data(table, mode, data):
         connect_volatile()
     try:
         cursor = current_connection.cursor()
+        # Get the number of columns in the table
         cursor.execute("SHOW columns FROM "+table)
         num_columns = len([col[0] for col in cursor.fetchall()])
 
+        # Create an insert statement using '%s' for each value we insert
         insert_stmt = "INSERT INTO "+table+" VALUES ("+("%s, "*(num_columns-1))+"%s)"
 
+        # Parse data string as a CSV file
         dataIO = StringIO(data)
         reader = csv.reader(dataIO)
         for row in reader:
+            # Error if any row has an incorrect number of values
             if len(row) is not num_columns:
                 cgiutils.print_error400("Error parsing data!\nIncorrect number of values in a row!")
                 exit()
+            # Insert data
             cursor.execute(insert_stmt, tuple(row))
+            # If in 'single' mode, commit after every insertion
             if mode == 'single':
                 current_connection.commit()
 
+        # If in 'bulk' mode, we need to commit only at the end
         if mode == 'bulk':
             current_connection.commit()
         cursor.close()

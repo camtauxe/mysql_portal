@@ -1,14 +1,13 @@
-To deploy the website to the server, run the shell script like so:
+The 'deploy' directory contains all of the files that are sent to the remote
+server (mysql.camerontauxe.com). The Web Server is configured so that when
+requesting any python file, instead of returning the file, the script is
+executed via CGI to generate the web page. The server is also configured to
+deny any requests to the contents of the 'private' and 'lib' directories.'
+The contents of 'lib' are used by the python scripts and contain common
+functions for interacting with MySQL or using CGI. The 'private' directory is
+for anything else that needs to be on the server but cannot be publicly
+accessible to the internet (currently unused).
 
-    sh deploySite.sh
+The 'data' directory contains the script for generating random sets of data.
 
-Note that everything within the deploy directory will be sent to the server,
-so be careful about including any sensitive information within that directory.
-
-Anything within the 'deploy/private' and 'deploy/lib' directory will not be
-accessible as the web server is configured to deny access to these directories
-
-The web server is configured to interpret any request for a python file (.py)
-within the deploy directory as a CGI (Common Gateway Interface) script.
-This means that the web server will run the script and return whatever that
-script sends to standard output as the HTTP response.
+The 'doc' directory contains the lab writeup
