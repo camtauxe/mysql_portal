@@ -22,6 +22,8 @@ MYSQL_READONLY_PASSWORD  = None
 MYSQL_VOLATILE_USER      = 'webserver'
 MYSQL_VOLATILE_PASSWORD  = 'C$482pass'
 
+TEMP_DATA_FILE_PATH = '/srv/data/TEMP.csv'
+
 READONLY_MODE = 0
 VOLATILE_MODE = 1
 
@@ -153,15 +155,15 @@ def serialize_cursor(cursor):
     serialized['rows'] = cursor.rowcount
     return serialized
 
-# Insert the given data (as a CSV string) into the given table
-# using the given mode ('single' or 'bulk').
+# Insert the given data (as a CSV string) into the given table using
+# single-insert mode
 #
 # Before attempting to insert, the data currently in the table is cleared.
 # If a connection has not already been established, or if one is
 # established but in read-only mode, the connection will be re-established
 # in volatile mode. For security, because this uses volatile mode, the 
 # connection will be closed immediately afterwards.
-def insert_data(table, mode, data):
+def insert_data_single(table, data):
     clear_table(table)
     global current_connection, current_mode
     if current_mode is not VOLATILE_MODE:
@@ -185,15 +187,46 @@ def insert_data(table, mode, data):
                 exit()
             # Insert data
             cursor.execute(insert_stmt, tuple(row))
-            # If in 'single' mode, commit after every insertion
-            if mode == 'single':
-                current_connection.commit()
 
-        # If in 'bulk' mode, we need to commit only at the end
-        if mode == 'bulk':
-            current_connection.commit()
+        # Commit changes
+        current_connection.commit()
         cursor.close()
         current_connection.close()
+    except mysql.connector.Error as err:
+        error_and_exit(err)
+
+# Insert the given data (as a CSV string) into the given table using
+# bulk-loading mode
+#
+# Before attempting to insert, the data currently in the table is cleared.
+# If a connection has not already been established, or if one is
+# established but in read-only mode, the connection will be re-established
+# in volatile mode. For security, because this uses volatile mode, the 
+# connection will be closed immediately afterwards.
+def insert_data_bulk(table, data):
+    clear_table(table)
+    global current_connection, current_mode
+    if current_mode is not VOLATILE_MODE:
+        connect_volatile()
+    try:
+        # Write the CSV string to a file
+        temp_file = open(TEMP_DATA_FILE_PATH, "w")
+        temp_file.write(data)
+        temp_file.close()
+
+        # Use LOAD DATA INFILE command to load CSV data
+        cursor = current_connection.cursor()
+        stmt =  ("LOAD DATA LOCAL INFILE '"+TEMP_DATA_FILE_PATH+"' INTO TABLE "+table+" FIELDS TERMINATED BY ','")
+        cursor.execute(stmt)
+        cursor.close()
+        current_connection.commit()
+        current_connection.close()
+    except IOError as err:
+        cgiutils.print_error500(
+            "An I/O Error occurred!\n"+
+            "Error code: "+str(err.errno)+"\n"
+        )
+        exit()
     except mysql.connector.Error as err:
         error_and_exit(err)
 

@@ -43,7 +43,10 @@ if table not in tables:
 
 # Do insertion and calculate time
 before = time()
-sqlutils.insert_data(table,insertType,data)
+if insertType == 'single':
+    sqlutils.insert_data_single(table,data)
+else:
+    sqlutils.insert_data_bulk(table,data)
 after = time()
 totalTime = str("%.3f" % (after - before))
 
