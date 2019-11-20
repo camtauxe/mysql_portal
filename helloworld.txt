@@ -1,6 +1,0 @@
-Please write your name below to confirm that you are able to
-commit and push to the repository!
-
-"Hello, World!" - Cameron
-"Hello, World!" - Kathleen
-"Hello, World!" - Jared

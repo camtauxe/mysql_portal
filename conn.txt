@@ -1,3 +1,0 @@
-[client]
-host="camerontauxe.com"
-database="cs482team"
